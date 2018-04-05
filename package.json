@@ -1,0 +1,30 @@
+{
+  "name": "hulk",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Hulk",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "mongoose": "^5.0.12",
+    "npm": "^5.8.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "Nuber"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS-3398-264/HulkRepo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CS-3398-264/HulkRepo/issues"
+  },
+  "homepage": "https://github.com/CS-3398-264/HulkRepo#readme"
+}
