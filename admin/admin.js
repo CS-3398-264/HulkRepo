@@ -1,8 +1,8 @@
-// User.js -- You’re creating a schema which 
-// will give every user in the database a specific look.
 var mongoose = require('mongoose');
 var AdminSchema = new mongoose.Schema({
 	name: String
 });
+// Model name is 'Admin'
 mongoose.model('Admin', AdminSchema);
+// Export for use in other parts of program
 module.exports = mongoose.model('Admin');
