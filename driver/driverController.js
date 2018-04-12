@@ -6,6 +6,9 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 var Driver = require('./Driver');
+
+var auth = require('basic-auth');
+
 module.exports = router;
 
 // CREATES A NEW DRIVER -- ONLY AVAILABLE TO ADMIN IF HE KNOWS THE CREDENTIALS
