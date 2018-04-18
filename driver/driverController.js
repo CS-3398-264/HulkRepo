@@ -28,7 +28,9 @@ router.post('/', function (req, res) {
 			available: req.body.available,
 			latitude: req.body.latitude,
 			longitude: req.body.longitude,
-			vehicleSize: re.body.vehicleSize
+			userLat: req.body.userLat,
+			userLon: req.body.userLon,
+			vehicleSize: req.body.vehicleSize
 		},
 	function (err, driver) {
 		if (err) return res.status(500).send("There was a problem adding the information to the database.");
