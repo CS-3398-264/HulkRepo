@@ -17,50 +17,89 @@ module.exports = router;
 */
 router.post('/', function (req, res) {
 	var credentials = auth(req);
-	if (!credentials || credentials.name !== 'admin' || credentials.pass !== 'secret') 
-	{
+	if (!credentials || credentials.name !== 'admin' || credentials.pass !== 'secret') {
 		res.statusCode = 401;
 		res.setHeader('WWW-Authenticate', 'Basic realm="example"');
 		res.end('Access denied');
-	} 
-	else 
-	{
+	} else {
+		
 		Driver.create({
 			name: req.body.name,
 			available: req.body.available,
 			latitude: req.body.latitude,
-			longitude: req.body.longitude
+			longitude: req.body.longitude,
+			vehicleSize: re.body.vehicleSize
 		},
-		function (err, driver) {
-			if (err) return res.status(500).send("There was a problem adding the information to the database.");
-			res.status(200).send("Access Granted. " + driver.name + " created.\n\n" + driver);
+	function (err, driver) {
+		if (err) return res.status(500).send("There was a problem adding the information to the database.");
+		res.status(200).send("Access Granted. " + driver.name + " created.\n\n" + driver);
 
-		});
+	});
 	}
 });
 
 // GETS A SINGLE USER FROM THE DATABASE
 router.get('/:id', function (req, res) {
-	Driver.findById(req.params.id, function (err, user) {
-		if (err) return res.status(500).send("There was a problem finding the user.");
+	Driver.findById(req.params.id, function (err, driver) {
+		if (err) return res.status(500).send("There was a problem finding the driver.");
 		if (!user) return res.status(404).send("No driver found.");
-		res.status(200).send(user);
+		res.status(200).send(driver);
 	});
 });
 
 
-// GETS ALL DRIVERS FROM THE DATABASE
+// GETS ALL DRIVERS FROM THE DATABASE, OR BY QUERY PARAMETERS
 router.get('/', function (req, res) {
-	Driver.find({}, function (err, drivers) {
-		if (err) return res.status(500).send("There was a problem finding the drivers.");
-		res.status(200).send(drivers);
-	});
+	if (req.query.name)
+	{
+		Driver.find({
+			name: req.query.name
+		}, function (err, drivers) {
+			if (err) return res.status(500).send("There was a problem finding the driver(s).");
+			res.status(200).send(drivers);
+		});
+	}
+	else if (req.query.available)
+	{		
+		Driver.find({
+			available: req.query.available
+		}, function (err, drivers) {
+			if (err) return res.status(500).send("There was a problem finding the driver(s).");
+			res.status(200).send(drivers);
+		});
+	}
+	else if (req.query.vehicleSize) {
+		Driver.find({
+			vehicleSize: req.query.vehicleSize
+		}, function (err, drivers) {
+			if (err) return res.status(500).send("There was a problem finding the driver(s).");
+			res.status(200).send(drivers);
+		});
+	}
+	else if (req.query.name && req.query.available)
+	{
+		Driver.find({
+			name: req.query.name,
+			available: req.query.available
+		}, function (err, drivers) {
+			if (err) return res.status(500).send("There was a problem finding the driver(s).");
+			res.status(200).send(drivers);
+		});
+	}
+	else
+	{
+		Driver.find({}, function (err, drivers) {
+			if (err) return res.status(500).send("There was a problem finding the driver(s).");
+			res.status(200).send(drivers);
+		});
+	}
 });
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE
-router.get('/', function (req, res) {
-	Driver.find({}, function (err, drivers) {
-		if (err) return res.status(500).send("There was a problem finding the drivers.");
+//// GETS A SINGLE DRIVER IN THE DATABASE
+router.get('/:id', function (req, res) {
+	Driver.findById(req.params.id, function (err, drivers) {
+		if (err) return res.status(500).send("There was a problem finding the driver.");
+		if (!drivers) return res.status(404).send("No driver found.");
 		res.status(200).send(drivers);
 	});
 });
@@ -84,9 +123,11 @@ router.delete('/:id', function (req, res) {
 	}
 	else
 	{
+
 		Driver.findByIdAndRemove(req.params.id, function (err, driver) {
 			if (err) return res.status(500).send("There was a problem deleting the driver.");
-			res.status(200).send("Access Granted. " + driver.name + " deleted.");
+			res.status(200).send("Access Granted. Driver deleted.");
 		});
 	}
 });
+
