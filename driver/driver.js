@@ -4,6 +4,8 @@ var DriverSchema = new mongoose.Schema({
 	available: Boolean,
 	latitude: Number,
 	longitude: Number,
+	userLat: Number,
+	userLon: Number,
 	vehicleSize: String
 });
 mongoose.model('Driver', DriverSchema);
