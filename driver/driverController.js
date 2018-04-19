@@ -44,7 +44,7 @@ router.post('/', function (req, res) {
 router.get('/:id', function (req, res) {
 	Driver.findById(req.params.id, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem finding the driver.");
-		if (!user) return res.status(404).send("No driver found.");
+		if (!driver) return res.status(404).send("No driver found.");
 		res.status(200).send(driver);
 	});
 });
