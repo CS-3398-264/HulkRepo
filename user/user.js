@@ -6,6 +6,8 @@ var UserSchema = new mongoose.Schema({
 	needPickup: Boolean,
 	longitude: Number,
 	latitude: Number,
+	driverLat: Number,
+	driverLon: Number,
 	rating: Number
 });
 mongoose.model('User', UserSchema);
