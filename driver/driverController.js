@@ -6,13 +6,9 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 var Driver = require('./Driver');
-<<<<<<< HEAD
-
-var auth = require("basic-auth");
-=======
 var auth = require('basic-auth');
 var distance = require('google-distance');
->>>>>>> a2576625d7428d8a406c34c305cf9f110bc22676
+var map = require('google_directions');
 
 module.exports = router;
 
@@ -35,6 +31,7 @@ router.post('/', function (req, res) {
 			longitude: req.body.longitude,
 			userLat: req.body.userLat,
 			userLon: req.body.userLon,
+			userID: req.body.userID,
 			vehicleSize: req.body.vehicleSize
 		},
 	function (err, driver) {
@@ -115,22 +112,97 @@ router.get('/:id', function (req, res) {
 	});
 });
 
+//// GETS DRIVER IN THE RADIUS
+router.get('/directions/:id', function (req, res) {
+	Driver.findById(req.params.id, function (err, driver) {
+		if (err) return res.status(500).send("There was a problem finding the driver.");
+		if (!driver) return res.status(404).send("No driver found.");
+
+		var params = {
+			// REQUIRED 
+			//origin: [driver.latitude + ", " + driver.longitude],
+			//destination: [driver.userLat + ", " +  driver.userLon] ,
+			origin: [driver.latitude + ", " + driver.longitude],
+			destination: [driver.userLat + ", " + driver.userLon],
+			key: "AIzaSyDbcwRS0g5wUo1lxrkUBxIJBLLZzRDRlJE",
+
+			// OPTIONAL 
+			mode: "driving",
+			avoid: "",
+			language: "",
+			units: "imperial",
+			region: "",
+		};
+
+		// get navigation steps as JSON object 
+		map.getDirectionSteps(params, function (err, steps) {
+			if (err) {
+				console.log(err);
+				return 1;
+			}
+
+			// parse the JSON object of steps into a string output 
+			var output = "";
+			var stepCounter = 1;
+			steps.forEach(function (stepObj) {
+				var instruction = stepObj.html_instructions;
+				instruction = instruction.replace(/<[^>]*>/g, ""); // regex to remove html tags 
+				var distance = stepObj.distance.text;
+				var duration = stepObj.duration.text;
+				output += "Step " + stepCounter + ": " + instruction + " (" + distance + "/" + duration + ")\n";
+				stepCounter++;
+			});
+			console.log(output);
+			res.status(200).send(driver + "\n\n" + output);
+
+		});
+	});
+});
+
+
+
 //// UPDATES A SINGLE DRIVER IN THE DATABASE -- SO THAT DRIVER CAN UPDATE HIMSELF AVAILABLE
 router.put('/:id', function (req, res) {
 	Driver.findByIdAndUpdate(req.params.id, req.body, { new: true }, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem updating the user.");
 		
-		distance.get({
-			origin: [driver.userLat + ", " + driver.userLon],
-			destination: [driver.latitude + ", " + driver.longitude],
-			mode: 'driving',
-			units: 'imperial'
-		},
-		function (err, data) {
-			if (err) return console.log(err);
-			if (!data) return console.log('no distance');
-			res.status(200).send("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n\n" + driver);
-			console.log("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n");
+		var params = {
+			// REQUIRED 
+			//origin: [driver.latitude + ", " + driver.longitude],
+			//destination: [driver.userLat + ", " +  driver.userLon] ,
+			origin: [driver.latitude + ", " + driver.longitude],
+			destination: [driver.userLat + ", " + driver.userLon],
+			key: "AIzaSyDbcwRS0g5wUo1lxrkUBxIJBLLZzRDRlJE",
+
+			// OPTIONAL 
+			mode: "driving",
+			avoid: "",
+			language: "",
+			units: "imperial",
+			region: "",
+		};
+
+		// get navigation steps as JSON object 
+		map.getDirectionSteps(params, function (err, steps) {
+			if (err) {
+				console.log(err);
+				return 1;
+			}
+
+			// parse the JSON object of steps into a string output 
+			var output = "";
+			var stepCounter = 1;
+			steps.forEach(function (stepObj) {
+				var instruction = stepObj.html_instructions;
+				instruction = instruction.replace(/<[^>]*>/g, ""); // regex to remove html tags 
+				var distance = stepObj.distance.text;
+				var duration = stepObj.duration.text;
+				output += "Step " + stepCounter + ": " + instruction + " (" + distance + "/" + duration + ")\n";
+				stepCounter++;
+			});
+			console.log(output);
+			res.status(200).send(driver + "\n\n" + output);
+
 		});
 	});
 });
