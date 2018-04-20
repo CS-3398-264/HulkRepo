@@ -1,3 +1,5 @@
+// Driver.js -- You’re creating a schema which 
+// will give every user in the database a specific look.
 var mongoose = require('mongoose');
 var DriverSchema = new mongoose.Schema({
 	name: String,
@@ -6,6 +8,7 @@ var DriverSchema = new mongoose.Schema({
 	longitude: Number,
 	userLat: Number,
 	userLon: Number,
+	userID: String,
 	vehicleSize: String
 });
 mongoose.model('Driver', DriverSchema);
