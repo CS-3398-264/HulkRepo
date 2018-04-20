@@ -6,7 +6,8 @@ var UserSchema = new mongoose.Schema({
 	needPickup: Boolean,
 	longitude: Number,
 	latitude: Number,
-	rating: Number
+	rating: {type: Number, default : 0 },
+	ratingList: [{ type: Number }]
 });
 mongoose.model('User', UserSchema);
 module.exports = mongoose.model('User');

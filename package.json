@@ -10,9 +10,11 @@
   "author": "Hulk",
   "license": "ISC",
   "dependencies": {
+    "basic-auth": "^2.0.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
-    "mongoose": "^5.0.12",
+    "google-maps": "^3.2.1",
+    "mongoose": "^5.0.14",
     "npm": "^5.8.0"
   },
   "devDependencies": {},
