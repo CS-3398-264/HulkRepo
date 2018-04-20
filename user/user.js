@@ -23,6 +23,7 @@ var UserSchema = new mongoose.Schema({
 	latitude: Number,
 	driverLat: Number,
 	driverLon: Number,
+	driverID: String,
 	rating: Number
 });
 mongoose.model('User', UserSchema);
