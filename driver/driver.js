@@ -9,7 +9,8 @@ var DriverSchema = new mongoose.Schema({
 	userLat: Number,
 	userLon: Number,
 	userID: String,
-	vehicleSize: String
+	vehicleSize: String,
+	logo: String
 });
 mongoose.model('Driver', DriverSchema);
 module.exports = mongoose.model('Driver');
