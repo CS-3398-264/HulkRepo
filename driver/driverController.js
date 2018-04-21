@@ -10,6 +10,9 @@ var auth = require('basic-auth');
 var distance = require('google-distance');
 var map = require('google_directions');
 
+require('console-png').attachTo(console);
+
+
 module.exports = router;
 
 // CREATES A NEW DRIVER -- ONLY AVAILABLE TO ADMIN IF HE KNOWS THE CREDENTIALS
@@ -32,7 +35,8 @@ router.post('/', function (req, res) {
 			userLat: req.body.userLat,
 			userLon: req.body.userLon,
 			userID: req.body.userID,
-			vehicleSize: req.body.vehicleSize
+			vehicleSize: req.body.vehicleSize,
+			logo: req.body.logo
 		},
 	function (err, driver) {
 		if (err) return res.status(500).send("There was a problem adding the information to the database.");
@@ -94,6 +98,10 @@ router.get('/:id', function (req, res) {
 		if (err) return res.status(500).send("There was a problem finding the driver.");
 		if (!driver) return res.status(404).send("No driver found.");
 
+		// Display the logo
+		var image = require('fs').readFileSync(__dirname + '/' + driver.logo +'.png');
+		console.png(image);
+
 		distance.get({
 			origin: [driver.userLat + ", " + driver.userLon],
 			destination: [driver.latitude + ", " + driver.longitude],
@@ -103,12 +111,10 @@ router.get('/:id', function (req, res) {
 		function (err, data) {
 			if (err) return console.log(err);
 			if (!data) return console.log('no distance');
-			console.log("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n");
-			dis = data.distance;
-			dur = data.duration;
-			res.status(200).send("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n\n" + driver);
+			console.log("\nArrival Time: " + data.duration + "\n");
+
+			res.status(200).send("\nArrival Time: " + data.duration + "\n\n" + driver);
 		});
-		
 	});
 });
 
@@ -119,9 +125,7 @@ router.get('/directions/:id', function (req, res) {
 		if (!driver) return res.status(404).send("No driver found.");
 
 		var params = {
-			// REQUIRED 
-			//origin: [driver.latitude + ", " + driver.longitude],
-			//destination: [driver.userLat + ", " +  driver.userLon] ,
+			// REQUIRED ,
 			origin: [driver.latitude + ", " + driver.longitude],
 			destination: [driver.userLat + ", " + driver.userLon],
 			key: "AIzaSyDbcwRS0g5wUo1lxrkUBxIJBLLZzRDRlJE",
@@ -140,7 +144,6 @@ router.get('/directions/:id', function (req, res) {
 				console.log(err);
 				return 1;
 			}
-
 			// parse the JSON object of steps into a string output 
 			var output = "";
 			var stepCounter = 1;
@@ -149,11 +152,29 @@ router.get('/directions/:id', function (req, res) {
 				instruction = instruction.replace(/<[^>]*>/g, ""); // regex to remove html tags 
 				var distance = stepObj.distance.text;
 				var duration = stepObj.duration.text;
-				output += "Step " + stepCounter + ": " + instruction + " (" + distance + "/" + duration + ")\n";
+				output += "Step " + stepCounter + ": " + instruction + " (" + distance + ")\n";
 				stepCounter++;
 			});
-			console.log(output);
-			res.status(200).send(driver + "\n\n" + output);
+
+			var totalT = "";
+			// From here we just want to get the arrival time
+			distance.get({
+				origin: [driver.userLat + ", " + driver.userLon],
+				destination: [driver.latitude + ", " + driver.longitude],
+				mode: 'driving',
+				units: 'imperial'
+			},
+			function (err, data) {
+				if (err) return console.log(err);
+				if (!data) return console.log('no distance');
+				console.log("\nArrival Time: " + data.duration + "\n-----\n");
+				totalT += data.duration;
+				res.status(200).send(driver + "\n\n" + output + "\nArrival Time: " + totalT);
+				//res.status(200).send("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n\n" + driver);
+			});
+
+			console.log("\n" + output);
+			
 
 		});
 	});
@@ -168,8 +189,6 @@ router.put('/:id', function (req, res) {
 		
 		var params = {
 			// REQUIRED 
-			//origin: [driver.latitude + ", " + driver.longitude],
-			//destination: [driver.userLat + ", " +  driver.userLon] ,
 			origin: [driver.latitude + ", " + driver.longitude],
 			destination: [driver.userLat + ", " + driver.userLon],
 			key: "AIzaSyDbcwRS0g5wUo1lxrkUBxIJBLLZzRDRlJE",
@@ -197,11 +216,28 @@ router.put('/:id', function (req, res) {
 				instruction = instruction.replace(/<[^>]*>/g, ""); // regex to remove html tags 
 				var distance = stepObj.distance.text;
 				var duration = stepObj.duration.text;
-				output += "Step " + stepCounter + ": " + instruction + " (" + distance + "/" + duration + ")\n";
+				output += "Step " + stepCounter + ": " + instruction + " (" + distance + ")\n";
 				stepCounter++;
 			});
-			console.log(output);
-			res.status(200).send(driver + "\n\n" + output);
+
+			var totalT = "";
+			// From here we just want to get the arrival time
+			distance.get({
+				origin: [driver.userLat + ", " + driver.userLon],
+				destination: [driver.latitude + ", " + driver.longitude],
+				mode: 'driving',
+				units: 'imperial'
+			},
+			function (err, data) {
+				if (err) return console.log(err);
+				if (!data) return console.log('no distance');
+				console.log("\nArrival Time: " + data.duration + "\n-----\n");
+				totalT += data.duration;
+				res.status(200).send(driver + "\n\n" + output + "\nArrival Time: " + totalT);
+				//res.status(200).send("Distance to user: " + data.distance + "\nArrival Time: " + data.duration + "\n\n" + driver);
+			});
+
+			console.log("\n" + output);
 
 		});
 	});
