@@ -12,9 +12,12 @@
   "dependencies": {
     "basic-auth": "^2.0.0",
     "body-parser": "^1.18.2",
+    "console-png": "^1.2.1",
     "express": "^4.16.3",
-    "google-maps": "^3.2.1",
-    "mongoose": "^5.0.14",
+    "google-distance": "^1.0.1",
+    "google-distance-matrix": "^1.1.1",
+    "google_directions": "^0.6.0",
+    "mongoose": "^5.0.12",
     "npm": "^5.8.0"
   },
   "devDependencies": {},
