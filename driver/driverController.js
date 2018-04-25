@@ -182,7 +182,7 @@ router.get('/directions/:id', function (req, res) {
 
 
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE -- SO THAT DRIVER CAN UPDATE HIMSELF AVAILABLE
+//// UPDATES A SINGLE DRIVER IN THE DATABASE -- SO THAT DRIVER CAN UPDATE HIMSELF AVAILABLE, ETC.
 router.put('/:id', function (req, res) {
 	Driver.findByIdAndUpdate(req.params.id, req.body, { new: true }, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem updating the user.");
@@ -243,6 +243,32 @@ router.put('/:id', function (req, res) {
 	});
 });
 
+//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings
+router.put('/rating/:id', function (req, res) {
+	Driver.findById(req.params.id, function (err, driver) {
+		if (err) return res.status(500).send("There was a problem finding the driver.");
+		if (!driver) return res.status(404).send("No driver found.");
+
+		var oldRating = driver.rating;
+
+		console.log("Test one: " + oldRating + "\n");
+
+		res.status(200).send(driver);
+
+		Driver.findByIdAndUpdate(req.params.id, req.body, { new: true }, function (err, driver) {
+			
+			if (err) return res.status(500).send("There was a problem updating the user.");
+			var test = req.body.numRatings;
+			driver.numRatings = test + 1;
+			console.log(driver.rating + " " + driver.numRatings);
+
+			var newRating = 0;
+			newRating = ((oldRating * driver.numRatings) + driverRating) / driver.numRatings;
+			console.log("Rating: " + newRating);
+
+		});
+	});
+});
 
 //// DELETES A DRIVER FROM THE DATABASE  -- ONLY AVAILABLE TO ADMIN IF HE KNOWS THE CREDENTIALS
 router.delete('/:id', function (req, res) {
