@@ -243,7 +243,7 @@ router.put('/:id', function (req, res) {
 	});
 });
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings
+//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings test
 router.put('/rating/:id', function (req, res) {
 	Driver.findById(req.params.id, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem finding the driver.");
@@ -268,7 +268,7 @@ router.put('/rating/:id', function (req, res) {
 
 		});
 	});
-});
+}); 
 
 //// DELETES A DRIVER FROM THE DATABASE  -- ONLY AVAILABLE TO ADMIN IF HE KNOWS THE CREDENTIALS
 router.delete('/:id', function (req, res) {
