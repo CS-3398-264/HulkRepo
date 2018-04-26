@@ -243,29 +243,23 @@ router.put('/:id', function (req, res) {
 	});
 });
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings test
+//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings test    
 router.put('/rating/:id', function (req, res) {
 	Driver.findById(req.params.id, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem finding the driver.");
 		if (!driver) return res.status(404).send("No driver found.");
 
-		var oldRating = driver.rating;
+		var newRating = 0;
+		newRating = ((driver.rating * (driver.numRatings)) + parseInt(req.body.rating)) / (driver.numRatings + 1);
+		console.log("Rating: " + newRating);
 
-		console.log("Test one: " + oldRating + "\n");
+		driver.rating = newRating.toFixed(2);
+		driver.numRatings++;
 
-		res.status(200).send(driver);
+		Driver.findByIdAndUpdate(req.params.id, driver, { new: true }, function (err, oldDriver) {
 
-		Driver.findByIdAndUpdate(req.params.id, req.body, { new: true }, function (err, driver) {
-			
 			if (err) return res.status(500).send("There was a problem updating the user.");
-			var test = req.body.numRatings;
-			driver.numRatings = test + 1;
-			console.log(driver.rating + " " + driver.numRatings);
-
-			var newRating = 0;
-			newRating = ((oldRating * driver.numRatings) + driverRating) / driver.numRatings;
-			console.log("Rating: " + newRating);
-
+			res.status(200).send(driver);
 		});
 	});
 }); 
