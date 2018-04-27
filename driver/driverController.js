@@ -10,8 +10,7 @@ var auth = require('basic-auth');
 var distance = require('google-distance');
 var map = require('google_directions');
 
-require('console-png').attachTo(console);
-
+require('console-png').attachTo(console); // for the icon
 
 module.exports = router;
 
@@ -36,7 +35,9 @@ router.post('/', function (req, res) {
 			userLon: req.body.userLon,
 			userID: req.body.userID,
 			vehicleSize: req.body.vehicleSize,
-			logo: req.body.logo
+			logo: req.body.logo,
+			rating: 0,
+			numRatings: 0
 		},
 	function (err, driver) {
 		if (err) return res.status(500).send("There was a problem adding the information to the database.");
@@ -101,6 +102,7 @@ router.get('/:id', function (req, res) {
 		// Display the logo
 		var image = require('fs').readFileSync(__dirname + '/' + driver.logo +'.png');
 		console.png(image);
+		console.log("Number of ratings: " + driver.numRatings + "\nRating: " + driver.rating + "\n");
 
 		distance.get({
 			origin: [driver.userLat + ", " + driver.userLon],
@@ -112,7 +114,7 @@ router.get('/:id', function (req, res) {
 			if (err) return console.log(err);
 			if (!data) return console.log('no distance');
 			console.log("\nArrival Time: " + data.duration + "\n");
-
+			
 			res.status(200).send("\nArrival Time: " + data.duration + "\n\n" + driver);
 		});
 	});
@@ -182,7 +184,8 @@ router.get('/directions/:id', function (req, res) {
 
 
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE -- SO THAT DRIVER CAN UPDATE HIMSELF AVAILABLE, ETC.
+//// UPDATES A SINGLE DRIVER IN THE DATABASE -- SO THAT DRIVER CAN UPDATE HIMSELF AVAILABLE
+// Directions are outputted with the PUT call so that as it's driving and updating it's lat/lon, it'll show the current directions.
 router.put('/:id', function (req, res) {
 	Driver.findByIdAndUpdate(req.params.id, req.body, { new: true }, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem updating the user.");
@@ -243,7 +246,7 @@ router.put('/:id', function (req, res) {
 	});
 });
 
-//// UPDATES A SINGLE DRIVER IN THE DATABASE -- Specific to updating ratings
+//// UPDATES A SINGLE USER IN THE DATABASE -- SO THAT USER CAN UPDATE HIMSELF AVAILABLE -- LETS KEEP IT AT 1 - 5
 router.put('/rating/:id', function (req, res) {
 	Driver.findById(req.params.id, function (err, driver) {
 		if (err) return res.status(500).send("There was a problem finding the driver.");
